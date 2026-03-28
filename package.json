@@ -1,0 +1,56 @@
+{
+  "name": "slopgate",
+  "version": "0.1.0",
+  "description": "Two-pass deterministic Slopgate obfuscation toolkit for HTML/CSS/JS assets.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/example/slopgate.git"
+  },
+  "homepage": "https://github.com/example/slopgate#readme",
+  "bugs": {
+    "url": "https://github.com/example/slopgate/issues"
+  },
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "slopgate": "dist/cli/command.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "SECURITY.md",
+    "CONTRIBUTING.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "test:release-gate": "vitest run tests/release.contract.test.ts tests/release.artifacts.test.ts tests/verify.integration.test.ts tests/safety.strictness.test.ts tests/determinism.test.ts",
+    "lint": "eslint . --ext .ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "format": "prettier --write .",
+    "clean": "rimraf dist .vitest-temp"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "@typescript-eslint/eslint-plugin": "^8.26.1",
+    "@typescript-eslint/parser": "^8.26.1",
+    "eslint": "^9.22.0",
+    "prettier": "^3.5.3",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.57.1",
+    "vitest": "^3.0.8"
+  }
+}

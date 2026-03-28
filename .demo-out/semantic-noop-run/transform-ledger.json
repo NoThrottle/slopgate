@@ -1,0 +1,29 @@
+[
+  {
+    "file": "app.js",
+    "stages": [
+      "parse",
+      "pass1",
+      "pass2",
+      "emit"
+    ]
+  },
+  {
+    "file": "index.html",
+    "stages": [
+      "parse",
+      "pass1",
+      "pass2",
+      "emit"
+    ]
+  },
+  {
+    "file": "styles.css",
+    "stages": [
+      "parse",
+      "pass1",
+      "pass2",
+      "emit"
+    ]
+  }
+]

@@ -1,0 +1,9 @@
+:root {
+  --accent : red;
+}
+.hero-card {
+  color: var(--accent);
+}
+#main {
+  padding: 4px;
+}

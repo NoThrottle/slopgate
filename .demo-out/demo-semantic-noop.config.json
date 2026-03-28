@@ -1,0 +1,45 @@
+{
+  "root": "tests/fixtures/pass1-semantic-noise",
+  "inputs": ["."],
+  "outDir": ".demo-out/semantic-noop-run",
+  "seed": "demo-seed-semantic-noop",
+  "sourceMaps": false,
+  "pass1": {
+    "enabled": true,
+    "js": {
+      "renameLocals": true,
+      "stringEncoding": "none",
+      "controlFlowFlattening": "off",
+      "deadCodeInjection": false,
+      "semanticNoise": "safe",
+      "noopNestingNoise": "safe"
+    },
+    "css": {
+      "renameClasses": false,
+      "renameIds": false,
+      "renameCustomProperties": false,
+      "noopRuleNoise": "off"
+    },
+    "html": {
+      "rewriteInlineScripts": false,
+      "rewriteInlineStyles": false,
+      "noopStructuralNoise": "off"
+    }
+  },
+  "pass2": {
+    "enabled": false,
+    "profile": "semantic-noise-v1",
+    "identifierStyle": "ambiguousTokens",
+    "preservePublicAPI": true
+  },
+  "safety": {
+    "strictMode": false,
+    "reservedNames": [],
+    "reservedPatterns": [],
+    "reservedCssClasses": [],
+    "reservedGlobals": [],
+    "abortOnCollision": true,
+    "abortOnDynamicEvalRisk": true,
+    "abortOnSemanticNoiseRisk": true
+  }
+}

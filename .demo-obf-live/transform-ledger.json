@@ -1,0 +1,17 @@
+[
+  {
+    "file": "tests/fixtures/tiny.js",
+    "stages": [
+      "parse",
+      "pass1",
+      "pass2",
+      "emit"
+    ]
+  },
+  {
+    "file": "tests/fixtures/tiny.js.map",
+    "stages": [
+      "sourcemap"
+    ]
+  }
+]

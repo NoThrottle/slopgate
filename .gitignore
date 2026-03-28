@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.vitest-temp/
+coverage/
+
+# AI/agent-generated documentation artifacts (scoped to internal planning folders)
+docs/SubAgent docs/
+docs/**/.subagent/
+docs/**/agent-artifacts/
+docs/**/ai-artifacts/

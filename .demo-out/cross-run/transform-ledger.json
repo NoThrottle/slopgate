@@ -1,0 +1,41 @@
+[
+  {
+    "file": "tests/fixtures/cross-asset-sync/app.js",
+    "stages": [
+      "parse",
+      "pass1",
+      "pass2",
+      "emit"
+    ]
+  },
+  {
+    "file": "tests/fixtures/cross-asset-sync/index.html",
+    "stages": [
+      "parse",
+      "pass1",
+      "pass2",
+      "emit"
+    ]
+  },
+  {
+    "file": "tests/fixtures/cross-asset-sync/styles.css",
+    "stages": [
+      "parse",
+      "pass1",
+      "pass2",
+      "emit"
+    ]
+  },
+  {
+    "file": "tests/fixtures/cross-asset-sync/app.js.map",
+    "stages": [
+      "sourcemap"
+    ]
+  },
+  {
+    "file": "tests/fixtures/cross-asset-sync/styles.css.map",
+    "stages": [
+      "sourcemap"
+    ]
+  }
+]

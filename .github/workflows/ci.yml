@@ -1,0 +1,107 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  gate-core-build-test:
+    name: gate-core-build-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm run test
+
+  gate-cli-e2e:
+    name: gate-cli-e2e
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Run CLI smoke fixture
+        run: node dist/cli/command.js run --input tests/fixtures/site --output .ci-temp/cli-e2e --seed ci-e2e-seed --json-report .ci-temp/cli-e2e/report.json
+      - name: Validate CLI artifacts
+        run: |
+          test -f .ci-temp/cli-e2e/app.js
+          test -f .ci-temp/cli-e2e/util.js
+          test -f .ci-temp/cli-e2e/index.html
+          test -f .ci-temp/cli-e2e/styles.css
+          test -f .ci-temp/cli-e2e/report.json
+
+  gate-determinism:
+    name: gate-determinism
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Run determinism check
+        run: |
+          node dist/cli/command.js run --input tests/fixtures/site --output .ci-temp/determinism-a --seed ci-determinism --json-report .ci-temp/determinism-a/report.json
+          node dist/cli/command.js run --input tests/fixtures/site --output .ci-temp/determinism-b --seed ci-determinism --json-report .ci-temp/determinism-b/report.json
+          cmp .ci-temp/determinism-a/app.js .ci-temp/determinism-b/app.js
+          cmp .ci-temp/determinism-a/util.js .ci-temp/determinism-b/util.js
+          cmp .ci-temp/determinism-a/index.html .ci-temp/determinism-b/index.html
+          cmp .ci-temp/determinism-a/styles.css .ci-temp/determinism-b/styles.css
+
+  gate-sourcemap-verify-placeholder:
+    name: gate-sourcemap-verify-placeholder
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Generate sourcemap fixtures
+        run: node dist/cli/command.js run --input tests/fixtures/site --output .ci-temp/sourcemap-verify --seed ci-sourcemap --json-report .ci-temp/sourcemap-verify/report.json
+      - name: Verify sourcemap placeholders
+        run: |
+          node -e "const fs=require('node:fs');const path=require('node:path');const root='.ci-temp/sourcemap-verify';for (const file of ['app.js.map','util.js.map','index.html.map','styles.css.map']) {const p=path.join(root,file);if(!fs.existsSync(p)){throw new Error('Missing source map: '+file);}const data=JSON.parse(fs.readFileSync(p,'utf8'));if(data.version!==3){throw new Error('Invalid source map version for '+file);}if(!Array.isArray(data.sources)||data.sources.length!==1){throw new Error('Unexpected source list for '+file);} }"
+
+  gate-release-v1:
+    name: gate-release-v1
+    runs-on: ubuntu-latest
+    needs:
+      - gate-core-build-test
+      - gate-cli-e2e
+      - gate-determinism
+      - gate-sourcemap-verify-placeholder
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Run targeted release-gate tests
+        run: npm run test:release-gate
+      - name: Validate npm package dry-run payload
+        run: |
+          mkdir -p .ci-temp
+          npm pack --dry-run --json > .ci-temp/pack-dry-run.json
+      - name: Assert package metadata and payload contract
+        run: |
+          node -e "const fs=require('node:fs');const pkg=JSON.parse(fs.readFileSync('package.json','utf8'));const pack=JSON.parse(fs.readFileSync('.ci-temp/pack-dry-run.json','utf8'));const files=(Array.isArray(pack)&&pack[0]&&Array.isArray(pack[0].files)?pack[0].files:[]).map((f)=>f.path);const mustInclude=['README.md','LICENSE','SECURITY.md','CONTRIBUTING.md','dist/index.js','dist/index.d.ts','dist/cli/command.js'];for(const file of mustInclude){if(!files.includes(file)){throw new Error('npm pack payload missing '+file);}}for(const output of ['dist/index.js','dist/index.d.ts','dist/cli/command.js']){if(!fs.existsSync(output)){throw new Error('Missing build output '+output);}}if(pkg.main!=='dist/index.js'){throw new Error('Unexpected main field');}if(pkg.types!=='dist/index.d.ts'){throw new Error('Unexpected types field');}if(!pkg.bin||pkg.bin['slopgate']!=='dist/cli/command.js'){throw new Error('Unexpected bin.slopgate field');}if(!pkg.exports||!pkg.exports['.']||pkg.exports['.'].default!=='./dist/index.js'||pkg.exports['.'].types!=='./dist/index.d.ts'){throw new Error('Unexpected exports contract');}"
+      - run: npm run test
+      - run: npm run lint
+      - run: npm run typecheck
