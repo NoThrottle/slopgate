@@ -138,5 +138,9 @@ describe("release artifacts", () => {
     for (const expectedPath of required) {
       expect(publishedFiles).toContain(expectedPath);
     }
+
+    expect(publishedFiles.some((p) => p.startsWith(".demo"))).toBe(false);
+    expect(publishedFiles.some((p) => p.includes("/.demo"))).toBe(false);
+    expect(publishedFiles.some((p) => p.includes(".demo."))).toBe(false);
   }, 20000);
 });

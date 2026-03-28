@@ -28,7 +28,10 @@
     "README.md",
     "LICENSE",
     "SECURITY.md",
-    "CONTRIBUTING.md"
+    "CONTRIBUTING.md",
+    "!dist/**/.demo*",
+    "!dist/**/.demo*/**",
+    "!dist/**/*.demo.*"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
